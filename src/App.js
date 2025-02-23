@@ -1,16 +1,41 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
+import Web3 from 'web3';
 
 function App() {
+  const [web3Api, setWeb3Api] = useState({
+    provider: null,
+    web3: null
+  })
   
   useEffect(() => {
     const loadProvider = async () => {
-      console.log(window.web3);
-      console.log(window.ethereum);
+      let provider = null;
+
+      if (window.ethereum) {
+        provider = window.ethereum
+
+        try {
+          await provider.enable()
+        } catch {
+          console.error("User denied accounts access!")
+        }
+      } else if (window.web3) {
+        provider = window.web3.currentProvider
+      } else if (!process.env.production) {
+        provider = new Web3.providers.HttpProvider('http://localhost:7545')
+      }
+
+      setWeb3Api({
+        web3: new Web3(provider),
+        provider
+      })
     }
 
     loadProvider()
   }, [])
+
+  console.log(web3Api.web3)
 
   return (
     <div className="faucet-wrapper">
@@ -19,15 +44,6 @@ function App() {
           Current Balance: <strong>10</strong> ETH
         </div>
         <div className='btn-wrapper'>
-          <button
-            className='btn'
-            onClick={async () => {
-              const accounts = await window.ethereum.request({method: "eth_requestAccounts"})
-              console.log(accounts);
-            }}
-          >
-            Enable Ethereum
-          </button>
           <button className='btn'>Donate</button>
           <button className='btn'>Withdraw</button>
         </div>
