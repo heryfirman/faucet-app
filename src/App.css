@@ -6,9 +6,22 @@
 }
 
 .faucet {
-  max-width: 500px;
+  width: 500px;
   height: auto;
   margin: 50px auto;
+  text-align: center;
+  overflow: hidden;
+}
+.faucet .info-account {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 40px auto 10px;
+}
+.info-account h1 {
+  font-size: 18px;
 }
 .faucet .info-balance {
   margin: 30px auto;
@@ -16,6 +29,7 @@
 
 .faucet .btn-wrapper {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 12px;
   margin: auto;

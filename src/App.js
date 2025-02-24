@@ -7,6 +7,8 @@ function App() {
     provider: null,
     web3: null
   })
+
+  const [account, setAccount] = useState(null)
   
   useEffect(() => {
     const loadProvider = async () => {
@@ -35,11 +37,22 @@ function App() {
     loadProvider()
   }, [])
 
-  console.log(web3Api.web3)
+  useEffect(() => {
+    const getAccount = async () => {
+      const accounts = await web3Api.web3.eth.getAccounts()
+      setAccount(accounts[0])
+    }
+
+    web3Api.web3 && getAccount()
+  }, [web3Api.web3])
 
   return (
     <div className="faucet-wrapper">
       <div className='faucet'>
+        <div className='info-account'>
+          <span><strong>Account: </strong></span>
+          <h1>{account ? account : "Not connected"}</h1>
+        </div>
         <div className='info-balance'>
           Current Balance: <strong>10</strong> ETH
         </div>
