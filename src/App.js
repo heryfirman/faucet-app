@@ -24,8 +24,8 @@ function App() {
         // Only request accounts if hot already processing
         try {
           const accounts = await provider.request({method: "eth_accounts"})
-          if (accounts.length === 0) {
-            await provider.request({method: "eth_requestAccounts"})
+          if (accounts.length > 0) {
+            setAccount(accounts[0])
           }
         } catch (error) {
           console.error("Error requesting accounts", error)
@@ -38,22 +38,34 @@ function App() {
     loadProvider()
   }, [])
 
-  useEffect(() => {
-    const getAccount = async () => {
-      const accounts = await web3Api.web3.eth.getAccounts()
-      setAccount(accounts[0])
+  const connectWallet = async () => {
+    if (!web3Api.provider) {
+      alert("Please install MetaMask!")
+      return
     }
 
-    web3Api.web3 && getAccount()
-  }, [web3Api.web3])
+    try {
+      const accounts = await web3Api.provider.request({method: "eth_requestAccounts"})
+      setAccount(accounts[0])
+    } catch (error) {
+      console.error("Error connecting wallet", error)
+    }
+  }
 
   return (
     <div className="faucet-wrapper">
       <div className='faucet'>
+        
         <div className='info-account'>
           <span><strong>Account: </strong></span>
-          <h1>{account ? account : "Not connected"}</h1>
+          {account ? 
+            <div>{account}</div> :
+            <button className='btn-connect' onClick={connectWallet}>
+              Connect Wallet
+            </button>
+          }
         </div>
+
         <div className='info-balance'>
           Current Balance: <strong>10</strong> ETH
         </div>
