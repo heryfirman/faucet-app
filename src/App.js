@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import Web3 from 'web3';
+import detectEthereumProvider from '@metamask/detect-provider'
 
 function App() {
   const [web3Api, setWeb3Api] = useState({
@@ -12,26 +13,26 @@ function App() {
   
   useEffect(() => {
     const loadProvider = async () => {
-      let provider = null;
+      const provider = await detectEthereumProvider() 
 
-      if (window.ethereum) {
-        provider = window.ethereum
+      if (provider) {
+        setWeb3Api({
+          web3: new Web3(provider),
+          provider
+        })
 
+        // Only request accounts if hot already processing
         try {
-          await provider.request({method: "eth_requestAccounts"})
-        } catch {
-          console.error("User denied accounts access!")
+          const accounts = await provider.request({method: "eth_accounts"})
+          if (accounts.length === 0) {
+            await provider.request({method: "eth_requestAccounts"})
+          }
+        } catch (error) {
+          console.error("Error requesting accounts", error)
         }
-      } else if (window.web3) {
-        provider = window.web3.currentProvider
-      } else if (!process.env.production) {
-        provider = new Web3.providers.HttpProvider('http://localhost:7545')
+      } else {
+        console.error('Please install MetaMask!')
       }
-
-      setWeb3Api({
-        web3: new Web3(provider),
-        provider
-      })
     }
 
     loadProvider()
